@@ -1,0 +1,53 @@
+{
+  "name": "project-to-text-manager",
+  "version": "1.0.0",
+  "description": "Windows desktop project-to-text conversion manager",
+  "main": "out/main/index.js",
+  "author": "Project-to-Text Manager",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "npm run lint && npm run typecheck && npm test && electron-vite build",
+    "dist:win": "npm run build && electron-builder --win nsis --x64 --config.npmRebuild=false",
+    "build:win": "npm run dist:win",
+    "preview": "electron-vite preview",
+    "postinstall": "electron-builder install-app-deps",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "chokidar": "^4.0.3",
+    "electron-updater": "^6.6.2",
+    "iconv-lite": "^0.7.0",
+    "ignore": "^7.0.5",
+    "minimatch": "^10.1.1",
+    "sanitize-filename": "^1.6.3",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@electron-toolkit/eslint-config-prettier": "^3.0.1",
+    "@electron-toolkit/eslint-config-ts": "^4.0.0",
+    "@fluentui/react-components": "^9.72.5",
+    "@fluentui/react-icons": "^2.0.319",
+    "@tanstack/react-virtual": "^3.13.12",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.1.1",
+    "electron": "^39.2.0",
+    "electron-builder": "^26.0.12",
+    "electron-vite": "^4.0.1",
+    "eslint": "^10.14.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.2",
+    "vitest": "^4.0.9",
+    "zustand": "^5.0.8"
+  }
+}

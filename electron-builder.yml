@@ -1,0 +1,34 @@
+appId: com.projecttotext.manager
+productName: Project-to-Text Manager
+asar: true
+npmRebuild: false
+directories:
+  buildResources: build
+  output: release
+files:
+  - out/**/*
+  - package.json
+win:
+  icon: build/icon.ico
+  executableName: Project-to-Text Manager
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: ${productName}-Setup-${version}-${arch}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowElevation: false
+  allowToChangeInstallationDirectory: true
+  createStartMenuShortcut: true
+  createDesktopShortcut: true
+  shortcutName: Project-to-Text Manager
+  deleteAppDataOnUninstall: false
+publish:
+  provider: github
+  owner: shinkaym
+  repo: project-to-text-manager
+  releaseType: release
+
+

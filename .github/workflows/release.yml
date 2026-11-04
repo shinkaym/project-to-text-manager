@@ -1,0 +1,58 @@
+name: Release Windows
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Validate release configuration
+        shell: pwsh
+        run: |
+          if (Select-String -Path electron-builder.yml,dev-app-update.yml -Pattern 'REPLACE_WITH_GITHUB_OWNER' -Quiet) {
+            throw 'Replace REPLACE_WITH_GITHUB_OWNER before publishing.'
+          }
+          $packageVersion = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -and $env:GITHUB_REF_NAME -ne "v$packageVersion") {
+            throw "Tag $env:GITHUB_REF_NAME must match package version v$packageVersion."
+          }
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate and bundle
+        run: npm run build
+
+      - name: Build, optionally sign, and publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.WINDOWS_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CSC_KEY_PASSWORD }}
+        run: npm exec -- electron-builder --win nsis --x64 --config.npmRebuild=false --publish always
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-to-text-manager-windows-${{ github.ref_name }}
+          path: |
+            release/*-Setup-*.exe
+            release/*.blockmap
+            release/latest.yml
+          if-no-files-found: error
+
