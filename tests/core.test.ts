@@ -8,7 +8,7 @@ import { defaultOutputBasename, outputFilename, sanitizeOutputBasename } from '.
 import { documentStart, projectTree } from '../src/main/services/document-renderer'
 import { OutputReservations } from '../src/main/services/output-reservations'
 import { ConfigStore } from '../src/main/services/config-store'
-import { APP_CONFIG_VERSION, type AppConfig } from '../src/shared/model'
+import { APP_CONFIG_VERSION, appConfigSchema, type AppConfig } from '../src/shared/model'
 
 describe('selection precedence', () => {
   it('lets a manual include override both preset and .gitignore exclusions', () => {
@@ -117,6 +117,7 @@ describe('versioned configuration store', () => {
       watcherEnabled: false,
       notificationsEnabled: false,
       taskConcurrency: 3 as const,
+      existingOutputBehavior: 'unique',
       globalHardExcludes: ['tmp'],
       checkForUpdatesOnStartup: false
     }
@@ -191,5 +192,13 @@ describe('versioned configuration store', () => {
     expect(reset.settings.outputDirectory).toBe(defaultOutput)
     expect(reset.settings.showHiddenFiles).toBe(true)
     expect(reset.settings.taskConcurrency).toBe('auto')
+    expect(reset.settings.existingOutputBehavior).toBe('ask')
+  })
+
+  it('defaults the output collision behavior for older configurations', () => {
+    const legacy = importedConfig()
+    delete (legacy.settings as Partial<AppConfig['settings']>).existingOutputBehavior
+
+    expect(appConfigSchema.parse(legacy).settings.existingOutputBehavior).toBe('ask')
   })
 })

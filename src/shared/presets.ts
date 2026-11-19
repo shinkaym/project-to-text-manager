@@ -10,7 +10,12 @@ export type FrameworkPreset = {
 }
 
 const commonExclude = ['**/*.lock', '**/*.min.js', '**/*.map', '**/*.log']
+
 const source = ['**/*.{ts,tsx,js,jsx,mjs,cjs,json,css,scss,html,md,yml,yaml}']
+
+const nativeSource = [
+  '**/*.{java,kt,kts,gradle,xml,properties,swift,m,mm,h,hpp,cpp,cc,c,plist,pbxproj,xcconfig}'
+]
 
 export const PRESETS: Record<FrameworkId, FrameworkPreset> = {
   react: {
@@ -21,6 +26,27 @@ export const PRESETS: Record<FrameworkId, FrameworkPreset> = {
     exclude: commonExclude,
     hardExcludeDirectories: ['.next', 'coverage']
   },
+
+  'react-native': {
+    id: 'react-native',
+    name: 'React Native / Expo',
+    version: 1,
+    include: [
+      ...source,
+      ...nativeSource,
+      'src/**',
+      'app/**',
+      'android/**',
+      'ios/**',
+      'app.json',
+      'app.config.*',
+      'babel.config.*',
+      'metro.config.*'
+    ],
+    exclude: commonExclude,
+    hardExcludeDirectories: ['.expo', '.gradle', 'Pods', 'coverage']
+  },
+
   nextjs: {
     id: 'nextjs',
     name: 'Next.js',
@@ -29,6 +55,30 @@ export const PRESETS: Record<FrameworkId, FrameworkPreset> = {
     exclude: commonExclude,
     hardExcludeDirectories: ['.next', 'coverage']
   },
+
+  flutter: {
+    id: 'flutter',
+    name: 'Flutter',
+    version: 1,
+    include: [
+      '**/*.{dart,json,md,yml,yaml,xml,gradle,properties,kt,kts,java,swift,m,mm,h,hpp,cpp,cc,c,plist,pbxproj,xcconfig}',
+      'lib/**',
+      'test/**',
+      'integration_test/**',
+      'web/**',
+      'android/**',
+      'ios/**',
+      'windows/**',
+      'macos/**',
+      'linux/**',
+      'pubspec.yaml',
+      'analysis_options.yaml',
+      'CMakeLists.txt'
+    ],
+    exclude: [...commonExclude, '.flutter-plugins', '.flutter-plugins-dependencies'],
+    hardExcludeDirectories: ['.dart_tool', '.gradle', 'Pods', 'coverage']
+  },
+
   vue: {
     id: 'vue',
     name: 'Vue',
@@ -37,6 +87,7 @@ export const PRESETS: Record<FrameworkId, FrameworkPreset> = {
     exclude: commonExclude,
     hardExcludeDirectories: ['.nuxt', '.output', 'coverage']
   },
+
   angular: {
     id: 'angular',
     name: 'Angular',
@@ -45,6 +96,7 @@ export const PRESETS: Record<FrameworkId, FrameworkPreset> = {
     exclude: commonExclude,
     hardExcludeDirectories: ['.angular', 'coverage']
   },
+
   svelte: {
     id: 'svelte',
     name: 'Svelte',
@@ -53,6 +105,7 @@ export const PRESETS: Record<FrameworkId, FrameworkPreset> = {
     exclude: commonExclude,
     hardExcludeDirectories: ['.svelte-kit', 'coverage']
   },
+
   electron: {
     id: 'electron',
     name: 'Electron',
@@ -61,6 +114,7 @@ export const PRESETS: Record<FrameworkId, FrameworkPreset> = {
     exclude: commonExclude,
     hardExcludeDirectories: ['coverage']
   },
+
   node: {
     id: 'node',
     name: 'Node.js',
@@ -69,6 +123,7 @@ export const PRESETS: Record<FrameworkId, FrameworkPreset> = {
     exclude: commonExclude,
     hardExcludeDirectories: ['coverage']
   },
+
   dotnet: {
     id: 'dotnet',
     name: '.NET',
@@ -77,6 +132,7 @@ export const PRESETS: Record<FrameworkId, FrameworkPreset> = {
     exclude: commonExclude,
     hardExcludeDirectories: ['bin', 'obj', '.vs']
   },
+
   python: {
     id: 'python',
     name: 'Python',
@@ -85,6 +141,7 @@ export const PRESETS: Record<FrameworkId, FrameworkPreset> = {
     exclude: [...commonExclude, '**/*.pyc'],
     hardExcludeDirectories: ['__pycache__', '.venv', 'venv', '.pytest_cache', '.mypy_cache']
   },
+
   java: {
     id: 'java',
     name: 'Java',
@@ -93,6 +150,7 @@ export const PRESETS: Record<FrameworkId, FrameworkPreset> = {
     exclude: commonExclude,
     hardExcludeDirectories: ['target', '.gradle']
   },
+
   go: {
     id: 'go',
     name: 'Go',
@@ -101,6 +159,7 @@ export const PRESETS: Record<FrameworkId, FrameworkPreset> = {
     exclude: commonExclude,
     hardExcludeDirectories: []
   },
+
   rust: {
     id: 'rust',
     name: 'Rust',
@@ -109,6 +168,7 @@ export const PRESETS: Record<FrameworkId, FrameworkPreset> = {
     exclude: commonExclude,
     hardExcludeDirectories: ['target']
   },
+
   generic: {
     id: 'generic',
     name: 'Generic Project',

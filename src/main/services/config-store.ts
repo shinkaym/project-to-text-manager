@@ -65,6 +65,7 @@ export class ConfigStore {
       watcherEnabled: true,
       notificationsEnabled: true,
       taskConcurrency: 'auto',
+      existingOutputBehavior: 'ask',
       globalHardExcludes: [],
       checkForUpdatesOnStartup: true
     }

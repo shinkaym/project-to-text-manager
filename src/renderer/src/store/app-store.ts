@@ -418,6 +418,7 @@ export const emptyConfig = (outputDirectory: string): AppConfig => ({
     watcherEnabled: true,
     notificationsEnabled: true,
     taskConcurrency: 'auto',
+    existingOutputBehavior: 'ask',
     globalHardExcludes: [],
     checkForUpdatesOnStartup: true
   }

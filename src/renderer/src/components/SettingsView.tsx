@@ -19,6 +19,7 @@ import {
   ArrowUpload20Regular,
   FolderOpen20Regular
 } from '@fluentui/react-icons'
+import type { ExistingOutputBehavior } from '../../../shared/model'
 import { BUILT_IN_HARD_EXCLUDES } from '../../../shared/presets'
 import { useAppStore } from '../store/app-store'
 
@@ -108,6 +109,20 @@ export function SettingsView(): React.JSX.Element {
               Choose…
             </Button>
           </div>
+        </Field>
+        <Field label="When an output file already exists">
+          <Select
+            value={config.settings.existingOutputBehavior}
+            onChange={(_, data) =>
+              void mutateConfig((draft) => {
+                draft.settings.existingOutputBehavior = data.value as ExistingOutputBehavior
+              })
+            }
+          >
+            <option value="ask">Ask every time</option>
+            <option value="overwrite">Overwrite</option>
+            <option value="unique">Use unique filename</option>
+          </Select>
         </Field>
       </section>
       <section className="settings-card">

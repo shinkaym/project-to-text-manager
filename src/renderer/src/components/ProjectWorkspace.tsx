@@ -37,6 +37,9 @@ export function ProjectWorkspace({ projectId }: Props): React.JSX.Element {
     state.config?.projects.find((candidate) => candidate.id === projectId)
   )
   const groups = useAppStore((state) => state.config?.groups ?? EMPTY_GROUPS)
+  const existingOutputBehavior = useAppStore(
+    (state) => state.config?.settings.existingOutputBehavior ?? 'ask'
+  )
   const scan = useAppStore((state) => state.scans[projectId])
   const selected = useAppStore((state) => state.selectedPaths[projectId] ?? EMPTY_SELECTED_PATHS)
   const dirty = useAppStore((state) =>
@@ -133,8 +136,7 @@ export function ProjectWorkspace({ projectId }: Props): React.JSX.Element {
     await scanProject(projectId)
   }
   const runConversion = async (
-    overwrite = false,
-    allowUnique = false,
+    behavior: 'overwrite' | 'unique' | undefined = undefined,
     bypassConflict = false
   ): Promise<void> => {
     setConverting(true)
@@ -150,6 +152,9 @@ export function ProjectWorkspace({ projectId }: Props): React.JSX.Element {
           return
         }
       }
+      const resolvedBehavior = behavior ?? existingOutputBehavior
+      const overwrite = resolvedBehavior === 'overwrite'
+      const allowUnique = resolvedBehavior === 'unique'
       const result = await convert(projectId, overwrite, allowUnique)
       if ((overwrite || allowUnique) && result.valid) setPreflight(null)
       else setPreflight(result)
@@ -406,7 +411,7 @@ export function ProjectWorkspace({ projectId }: Props): React.JSX.Element {
                   if (taskId)
                     void window.desktop.conversion
                       .cancel(taskId)
-                      .then(() => runConversion(false, false, true))
+                      .then(() => runConversion(undefined, true))
                 }}
               >
                 Cancel Current
@@ -414,7 +419,7 @@ export function ProjectWorkspace({ projectId }: Props): React.JSX.Element {
               <Button
                 onClick={() => {
                   setConflictTaskId(null)
-                  void runConversion(false, false, true)
+                  void runConversion(undefined, true)
                 }}
               >
                 Queue New
@@ -473,7 +478,7 @@ export function ProjectWorkspace({ projectId }: Props): React.JSX.Element {
                     className="preflight-action"
                     onClick={() => {
                       setPreflight(null)
-                      void runConversion(true)
+                      void runConversion('overwrite')
                     }}
                   >
                     Overwrite
@@ -482,7 +487,7 @@ export function ProjectWorkspace({ projectId }: Props): React.JSX.Element {
                     className="preflight-action"
                     onClick={() => {
                       setPreflight(null)
-                      void runConversion(false, true)
+                      void runConversion('unique')
                     }}
                   >
                     Use unique filename

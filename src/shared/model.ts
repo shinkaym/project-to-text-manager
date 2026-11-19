@@ -5,7 +5,9 @@ export const SESSION_VERSION = 1 as const
 
 export const frameworkIdSchema = z.enum([
   'react',
+  'react-native',
   'nextjs',
+  'flutter',
   'vue',
   'angular',
   'svelte',
@@ -56,12 +58,16 @@ export const groupSchema = z.object({
 })
 export type Group = z.infer<typeof groupSchema>
 
+export const existingOutputBehaviorSchema = z.enum(['ask', 'overwrite', 'unique'])
+export type ExistingOutputBehavior = z.infer<typeof existingOutputBehaviorSchema>
+
 export const settingsSchema = z.object({
   outputDirectory: z.string().min(1),
   showHiddenFiles: z.boolean().default(true),
   watcherEnabled: z.boolean().default(true),
   notificationsEnabled: z.boolean().default(true),
   taskConcurrency: z.union([z.literal('auto'), z.number().int().min(1).max(8)]).default('auto'),
+  existingOutputBehavior: existingOutputBehaviorSchema.default('ask'),
   globalHardExcludes: z.array(z.string()).default([]),
   checkForUpdatesOnStartup: z.boolean().default(true)
 })
@@ -79,31 +85,41 @@ export const appConfigSchema = z
     const groupIds = new Set(config.groups.map((group) => group.id))
     const projectIds = new Set<string>()
     const canonicalPaths = new Set<string>()
+
     for (const project of config.projects) {
       if (projectIds.has(project.id))
         context.addIssue({ code: 'custom', message: `Duplicate project id: ${project.id}` })
+
       projectIds.add(project.id)
+
       const canonical = project.canonicalPath.toLocaleLowerCase('en-US')
+
       if (canonicalPaths.has(canonical))
         context.addIssue({ code: 'custom', message: `Duplicate project path: ${project.path}` })
+
       canonicalPaths.add(canonical)
+
       if (project.groupId && !groupIds.has(project.groupId))
         context.addIssue({ code: 'custom', message: `Unknown group: ${project.groupId}` })
+
       if (!project.profiles.some((profile) => profile.id === project.activeProfileId))
         context.addIssue({
           code: 'custom',
           message: `Active profile is missing for ${project.displayName}`
         })
     }
+
     for (const project of config.retainedProjectConfigs) {
       if (projectIds.has(project.id))
         context.addIssue({
           code: 'custom',
           message: `Duplicate retained project id: ${project.id}`
         })
+
       projectIds.add(project.id)
     }
   })
+
 export type AppConfig = z.infer<typeof appConfigSchema>
 
 export const layoutSchema = z.object({
@@ -125,13 +141,24 @@ export const sessionSchema = z.object({
   layout: layoutSchema
 })
 export type SessionState = z.infer<typeof sessionSchema>
+
 export type ConfigLoadResult = {
   config: AppConfig
   recoveryRequired?: boolean
   recoveryMessage?: string
 }
-export type DetectedFramework = { id: FrameworkId; name: string; evidence: string[] }
-export type PickedProject = { token: string; folderName: string; detections: DetectedFramework[] }
+
+export type DetectedFramework = {
+  id: FrameworkId
+  name: string
+  evidence: string[]
+}
+
+export type PickedProject = {
+  token: string
+  folderName: string
+  detections: DetectedFramework[]
+}
 
 export type FileTreeNode = {
   id: string
@@ -156,8 +183,10 @@ export type ScanResult = {
   scannedAt: string
   warnings: string[]
 }
+
 export const outputFormatSchema = z.enum(['markdown', 'txt'])
 export type OutputFormat = z.infer<typeof outputFormatSchema>
+
 export const fileBaselineSchema = z.object({
   relativePath: z.string().min(1),
   size: z.number().nonnegative(),
@@ -192,14 +221,22 @@ export type PreflightIssue = {
   relativePath?: string
   message: string
 }
+
 export type PreflightResult = {
   valid: boolean
   issues: PreflightIssue[]
   outputPath: string
   outputExists: boolean
 }
+
 export type TaskStatus = 'queued' | 'running' | 'completed' | 'failed' | 'cancelled'
-export type TaskLog = { at: string; level: 'info' | 'warning' | 'error'; message: string }
+
+export type TaskLog = {
+  at: string
+  level: 'info' | 'warning' | 'error'
+  message: string
+}
+
 export type ConversionTask = {
   id: string
   projectId: string
@@ -235,6 +272,7 @@ export type AppEventMap = {
   'updater:changed': UpdateState
   'app:before-close': undefined
 }
+
 export type Unsubscribe = () => void
 
 export interface DesktopApi {
@@ -246,6 +284,7 @@ export interface DesktopApi {
     resetLocalData(): Promise<AppConfig>
     resetSettings(): Promise<AppConfig>
   }
+
   projects: {
     pick(): Promise<PickedProject | null>
     add(input: {
@@ -258,7 +297,11 @@ export interface DesktopApi {
     scan(input: { projectId: string; profileId: string }): Promise<ScanResult>
     refreshAvailability(): Promise<Record<string, boolean>>
   }
-  output: { pickDirectory(): Promise<string | null> }
+
+  output: {
+    pickDirectory(): Promise<string | null>
+  }
+
   conversion: {
     preflight(request: ConversionRequest): Promise<PreflightResult>
     enqueue(request: ConversionRequest): Promise<ConversionTask>
@@ -266,13 +309,27 @@ export interface DesktopApi {
     list(): Promise<ConversionTask[]>
     clearFinished(): Promise<ConversionTask[]>
   }
-  session: { load(): Promise<SessionState>; save(session: SessionState): Promise<SessionState> }
-  watcher: { sync(openProjectIds: string[]): Promise<void> }
-  updater: { check(): Promise<UpdateState>; download(): Promise<void>; install(): Promise<void> }
+
+  session: {
+    load(): Promise<SessionState>
+    save(session: SessionState): Promise<SessionState>
+  }
+
+  watcher: {
+    sync(openProjectIds: string[]): Promise<void>
+  }
+
+  updater: {
+    check(): Promise<UpdateState>
+    download(): Promise<void>
+    install(): Promise<void>
+  }
+
   app: {
     confirmClose(action: 'save' | 'discard' | 'cancel'): Promise<void>
     version(): Promise<string>
   }
+
   on<K extends keyof AppEventMap>(
     channel: K,
     listener: (payload: AppEventMap[K]) => void
@@ -289,6 +346,7 @@ export const defaultLayout = (): LayoutState => ({
   logPanelHeight: 220,
   logPanelCollapsed: true
 })
+
 export const defaultSession = (): SessionState => ({
   schemaVersion: SESSION_VERSION,
   openProjectIds: [],
