@@ -241,8 +241,14 @@ export function registerIpc(deps: Dependencies): void {
       sendConfig(config)
       project = config.projects.find((candidate) => candidate.id === input.projectId)!
     }
+    const scanTarget = structuredClone(project)
+    if (input.selectionOverride) {
+      const profile = scanTarget.profiles.find((candidate) => candidate.id === input.profileId)
+      if (!profile) throw new Error('Profile not found')
+      profile.selection = structuredClone(input.selectionOverride)
+    }
     return scanProject({
-      project,
+      project: scanTarget,
       profileId: input.profileId,
       globalHardExcludes: config.settings.globalHardExcludes
     })

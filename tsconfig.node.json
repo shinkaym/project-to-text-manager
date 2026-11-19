@@ -11,5 +11,12 @@
     "types": ["node", "electron-vite/node"],
     "allowSyntheticDefaultImports": true
   },
-  "include": ["electron.vite.config.ts", "src/main/**/*.ts", "src/preload/**/*.ts", "src/shared/**/*.ts", "tests/**/*.ts"]
+  "include": [
+    "electron.vite.config.ts",
+    "src/main/**/*.ts",
+    "src/preload/**/*.ts",
+    "src/shared/**/*.ts",
+    "src/renderer/src/store/batch-conversion.ts",
+    "tests/**/*.ts"
+  ]
 }

@@ -12,6 +12,7 @@ import {
 } from '@fluentui/react-components'
 import {
   Dismiss16Regular,
+  DocumentMultiple20Regular,
   Folder20Regular,
   PanelLeftContract20Regular,
   PanelLeftExpand20Regular,
@@ -22,6 +23,7 @@ import { PRESETS } from '../../shared/presets'
 import { activeProfileDirty, useAppStore } from './store/app-store'
 import { ProjectSidebar } from './components/ProjectSidebar'
 import { ProjectWorkspace } from './components/ProjectWorkspace'
+import { BatchConvertView } from './components/BatchConvertView'
 import { SettingsView } from './components/SettingsView'
 import { TaskLog, TasksView } from './components/TasksView'
 
@@ -42,6 +44,7 @@ export default function App(): React.JSX.Element {
   const scans = useAppStore((state) => state.scans)
   const selectedPaths = useAppStore((state) => state.selectedPaths)
   const outputStates = useAppStore((state) => state.output)
+  const batchRows = useAppStore((state) => state.batchRows)
   const message = useAppStore((state) => state.message)
   const setMessage = useAppStore((state) => state.setMessage)
   const recoveryRequired = useAppStore((state) => state.recoveryRequired)
@@ -145,6 +148,8 @@ export default function App(): React.JSX.Element {
     useAppStore.setState({
       config: recovered,
       session: sessionAfterRecovery,
+      batchRows: {},
+      batchBanner: null,
       recoveryRequired: false,
       recoveryMessage: null
     })
@@ -156,7 +161,9 @@ export default function App(): React.JSX.Element {
     <div className="app-shell">
       <div className="app-titlebar">
         <span>Project-to-Text Manager</span>
-        <span className="title-context">{activeProject?.displayName ?? ''}</span>
+        <span className="title-context">
+          {activity === 'batch' ? 'Batch Convert' : (activeProject?.displayName ?? '')}
+        </span>
       </div>
       <div className="shell-body">
         <nav className="activity-rail" aria-label="Primary navigation">
@@ -166,6 +173,14 @@ export default function App(): React.JSX.Element {
               icon={<Folder20Regular />}
               onClick={() => setActivity('projects')}
               aria-label="Projects"
+            />
+          </span>
+          <span className="rail-action" data-tooltip="Batch Convert">
+            <Button
+              appearance={activity === 'batch' ? 'primary' : 'subtle'}
+              icon={<DocumentMultiple20Regular />}
+              onClick={() => setActivity('batch')}
+              aria-label="Batch Convert"
             />
           </span>
           <span className="rail-button-wrap rail-action" data-tooltip="Tasks / Logs">
@@ -312,19 +327,36 @@ export default function App(): React.JSX.Element {
               </div>
             </>
           )}
+          {activity === 'batch' && <BatchConvertView />}
           {activity === 'tasks' && <TasksView />}
           {activity === 'settings' && <SettingsView />}
         </div>
       </div>
       <footer className="status-bar">
-        <span>{activeProject ? PRESETS[activeProject.framework].name : 'No project'}</span>
-        <span>{activeProfile?.name ?? 'No profile'}</span>
-        <span>{activeSelected.toLocaleString()} selected</span>
-        <span>{activeFormat === 'markdown' ? 'Markdown' : 'TXT'}</span>
+        {activity === 'batch' ? (
+          <>
+            <span>{Object.values(batchRows).filter((row) => row.selected).length} selected</span>
+            <span>
+              {
+                    Object.values(batchRows).filter(
+                      (row) => row.selected && ['ready', 'warning', 'conflict'].includes(row.status)
+                    ).length
+              }{' '}
+              prepared
+            </span>
+          </>
+        ) : (
+          <>
+            <span>{activeProject ? PRESETS[activeProject.framework].name : 'No project'}</span>
+            <span>{activeProfile?.name ?? 'No profile'}</span>
+            <span>{activeSelected.toLocaleString()} selected</span>
+            <span>{activeFormat === 'markdown' ? 'Markdown' : 'TXT'}</span>
+          </>
+        )}
         <span>Watcher: {config.settings.watcherEnabled ? 'On' : 'Off'}</span>
         <span>{tasks.filter((task) => task.status === 'running').length} running</span>
         <span className="status-spacer" />
-        <span>{activeScan?.status ?? 'idle'}</span>
+        <span>{activity === 'batch' ? 'batch' : (activeScan?.status ?? 'idle')}</span>
       </footer>
 
       <Dialog open={!!closingProject}>

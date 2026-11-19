@@ -294,7 +294,11 @@ export interface DesktopApi {
     }): Promise<AppConfig>
     pickRelink(projectId: string): Promise<PickedProject | null>
     relink(input: { projectId: string; token: string; framework: FrameworkId }): Promise<AppConfig>
-    scan(input: { projectId: string; profileId: string }): Promise<ScanResult>
+    scan(input: {
+      projectId: string
+      profileId: string
+      selectionOverride?: Selection
+    }): Promise<ScanResult>
     refreshAvailability(): Promise<Record<string, boolean>>
   }
 

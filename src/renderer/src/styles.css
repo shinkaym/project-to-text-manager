@@ -102,7 +102,7 @@ h1, h2, h3, p { margin-top: 0; }
 .log-placeholder { color: #777; }
 .status-bar { display: flex; align-items: center; gap: 18px; padding: 0 8px; background: #0f6cbd; color: #fff; font-size: 11px; }
 .status-spacer { flex: 1; }
-.settings-view, .tasks-view { height: 100%; overflow: auto; padding: 28px 36px 50px; }
+.settings-view, .tasks-view, .batch-view { height: 100%; overflow: auto; padding: 28px 36px 50px; }
 .view-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 24px; }
 .view-header h1 { margin-bottom: 4px; }
 .settings-card { max-width: 880px; margin-bottom: 20px; padding: 18px; border: 1px solid #353535; background: #222; display: flex; flex-direction: column; gap: 13px; }
@@ -120,7 +120,32 @@ h1, h2, h3, p { margin-top: 0; }
 .issue-list .warning { color: #e2c08d; }
 .preflight-actions { display: flex !important; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .preflight-action { flex: 0 0 auto !important; width: auto !important; min-width: max-content !important; white-space: nowrap !important; }
+.batch-header { gap: 20px; }
+.batch-actions { flex-wrap: wrap; justify-content: flex-end; }
+.batch-banner { min-height: 42px; margin-bottom: 14px; padding: 7px 10px; display: flex; justify-content: space-between; align-items: center; gap: 14px; border: 1px solid #2f6e3b; background: #183620; color: #c9e9ce; }
+.batch-banner.warning { border-color: #765d17; background: #332b16; color: #f0d58c; }
+.batch-summary { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 10px; color: #aaa; font-size: 12px; }
+.batch-summary strong { color: #ddd; }
+.batch-table-wrap { min-width: 0; overflow-x: auto; border: 1px solid #353535; }
+.batch-table { width: 100%; min-width: 920px; border-collapse: collapse; background: #202020; }
+.batch-table th, .batch-table td { padding: 9px 10px; border-bottom: 1px solid #353535; text-align: left; vertical-align: middle; }
+.batch-table thead th { position: sticky; top: -28px; z-index: 2; background: #1b1b1b; color: #aaa; font-size: 12px; font-weight: 600; }
+.batch-table thead th:first-child { width: 42px; }
+.batch-table tbody tr:not(.batch-group-row):hover { background: #292929; }
+.batch-group-row th { padding-top: 7px; padding-bottom: 7px; background: #252525; }
+.batch-project-name { min-width: 150px; display: flex; flex-direction: column; gap: 2px; }
+.batch-project-name small { color: #929292; }
+.batch-table td:nth-child(3) { min-width: 150px; }
+.batch-table td:nth-child(4) { min-width: 118px; }
+.batch-table td:nth-child(5) { min-width: 230px; }
+.batch-table td:nth-child(6) { min-width: 190px; }
+.batch-project-unavailable { opacity: .58; }
+.batch-status-cell { display: flex; align-items: center; gap: 7px; min-width: 0; }
+.batch-status-cell > span:nth-child(2) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.batch-status-cell .fui-Button { margin-left: auto; }
+.batch-empty { height: 180px; }
 @media (max-width: 1150px) { .tree-toolbar { flex-wrap: wrap; } .config-pane { min-width: 280px; } }
+@media (max-width: 900px) { .batch-header { flex-direction: column; } .batch-actions { justify-content: flex-start; } }
 
 
 .rail-button-wrap { position: relative; display: inline-flex; }
